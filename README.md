@@ -12,10 +12,10 @@ README files found in this repository.**
 
 | Team Member | Student Name           | Email Address               | Role                    |
 |-------------|------------------------|-----------------------------|-------------------------|
-| 1           |                        |                             | Team Lead               |
-| 2           |                        |                             | Database Architect      |
-| 3           |                        |                             | Database Developer      |
-| 4           |                        |                             | Database Analyst/Tester |
+| 1           |        Jaylin Jack     |     jjack1@mail.sfsu.edu    | Team Lead               |
+| 2           |     Jaylin Jack        |    jjack1@mail.sfsu.edu     | Database Architect      |
+| 3           |        Jaylin Jack     |    jjack1@mail.sfsu.edu     |     Database Developer      |
+| 4           |            Jaylin Jack |    jjack1@mail.sfsu.edu     | Database Analyst/Tester |
 
 
 --- 
