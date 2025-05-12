@@ -6,45 +6,45 @@ COLLABORATORS: Jaylin Jack
 
 USE MultimediaContentDB;
 
--- INSERTS FOR TRIGGER TEST 1.
-INSERT INTO Watchlist (user, content) VALUES (1, 1);
-INSERT INTO Watchlist (user, content) VALUES (2, 2);
-INSERT INTO Watchlist (user, content) VALUES (2, 3);
-INSERT INTO Watchlist (user, content) VALUES (2, 4);
-INSERT INTO Watchlist (user, content) VALUES (2, 5);
-INSERT INTO Watchlist (user, content) VALUES (2, 2);
-INSERT INTO Watchlist (user, content) VALUES (2, 6);
-INSERT INTO Watchlist (user, content) VALUES (2, 7);
-INSERT INTO Watchlist (user, content) VALUES (2, 1);
-INSERT INTO Watchlist (user, content) VALUES (2, 8);
-INSERT INTO Watchlist (user, content) VALUES (2, 9);
-INSERT INTO Watchlist (user, content) VALUES (2, 10);
-INSERT INTO Watchlist (user, content) VALUES (2, 11);
-INSERT INTO Watchlist (user, content) VALUES (2, 12);
-INSERT INTO Watchlist (user, content) VALUES (2, 13);
-INSERT INTO Watchlist (user, content) VALUES (2, 14);
-INSERT INTO Watchlist (user, content) VALUES (2, 15);
-INSERT INTO Watchlist (user, content) VALUES (2, 16);
-INSERT INTO Watchlist (user, content) VALUES (2, 17);
-INSERT INTO Watchlist (user, content) VALUES (2, 18);
-INSERT INTO Watchlist (user, content) VALUES (3, 7016);
-INSERT INTO Watchlist (user, content) VALUES (4, 183);
-INSERT INTO Watchlist (user, content) VALUES (2, 183);
-INSERT INTO Watchlist (user, content) VALUES (2, 184);
-INSERT INTO Watchlist (user, content) VALUES (2, 185);
-INSERT INTO Watchlist (user, content) VALUES (2, 186);
-INSERT INTO Watchlist (user, content) VALUES (2, 187);
-INSERT INTO Watchlist (user, content) VALUES (2, 188);
-INSERT INTO Watchlist (user, content) VALUES (2, 189);
-INSERT INTO Watchlist (user, content) VALUES (2, 190);
-INSERT INTO Watchlist (user, content) VALUES (2, 192);
-INSERT INTO Watchlist (user, content) VALUES (2, 194);
-INSERT INTO Watchlist (user, content) VALUES (2, 195);
-INSERT INTO Watchlist (user, content) VALUES (2, 196);
-INSERT INTO Watchlist (user, content) VALUES (2, 197);
-INSERT INTO Watchlist (user, content) VALUES (2, 1968);
-INSERT INTO Watchlist (user, content) VALUES (2, 200);
-INSERT INTO Watchlist (user, content) VALUES (2, 248);
+# -- INSERTS FOR TRIGGER TEST 1.
+# INSERT INTO Watchlist (user, content) VALUES (1, 1);
+# INSERT INTO Watchlist (user, content) VALUES (2, 2);
+# INSERT INTO Watchlist (user, content) VALUES (2, 3);
+# INSERT INTO Watchlist (user, content) VALUES (2, 4);
+# INSERT INTO Watchlist (user, content) VALUES (2, 5);
+# INSERT INTO Watchlist (user, content) VALUES (2, 2);
+# INSERT INTO Watchlist (user, content) VALUES (2, 6);
+# INSERT INTO Watchlist (user, content) VALUES (2, 7);
+# INSERT INTO Watchlist (user, content) VALUES (2, 1);
+# INSERT INTO Watchlist (user, content) VALUES (2, 8);
+# INSERT INTO Watchlist (user, content) VALUES (2, 9);
+# INSERT INTO Watchlist (user, content) VALUES (2, 10);
+# INSERT INTO Watchlist (user, content) VALUES (2, 11);
+# INSERT INTO Watchlist (user, content) VALUES (2, 12);
+# INSERT INTO Watchlist (user, content) VALUES (2, 13);
+# INSERT INTO Watchlist (user, content) VALUES (2, 14);
+# INSERT INTO Watchlist (user, content) VALUES (2, 15);
+# INSERT INTO Watchlist (user, content) VALUES (2, 16);
+# INSERT INTO Watchlist (user, content) VALUES (2, 17);
+# INSERT INTO Watchlist (user, content) VALUES (2, 18);
+# INSERT INTO Watchlist (user, content) VALUES (3, 7016);
+# INSERT INTO Watchlist (user, content) VALUES (4, 183);
+# INSERT INTO Watchlist (user, content) VALUES (2, 183);
+# INSERT INTO Watchlist (user, content) VALUES (2, 184);
+# INSERT INTO Watchlist (user, content) VALUES (2, 185);
+# INSERT INTO Watchlist (user, content) VALUES (2, 186);
+# INSERT INTO Watchlist (user, content) VALUES (2, 187);
+# INSERT INTO Watchlist (user, content) VALUES (2, 188);
+# INSERT INTO Watchlist (user, content) VALUES (2, 189);
+# INSERT INTO Watchlist (user, content) VALUES (2, 190);
+# INSERT INTO Watchlist (user, content) VALUES (2, 192);
+# INSERT INTO Watchlist (user, content) VALUES (2, 194);
+# INSERT INTO Watchlist (user, content) VALUES (2, 195);
+# INSERT INTO Watchlist (user, content) VALUES (2, 196);
+# INSERT INTO Watchlist (user, content) VALUES (2, 197);
+# INSERT INTO Watchlist (user, content) VALUES (2, 1968);
+# INSERT INTO Watchlist (user, content) VALUES (2, 200);
+# INSERT INTO Watchlist (user, content) VALUES (2, 248);
 
 
 
