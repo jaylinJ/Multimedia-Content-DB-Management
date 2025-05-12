@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/Scripts/Databasemodel.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/Events.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/Functions.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/InsertsAfterReadData.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/InsertsBeforeReadData.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/Procedures.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/Tests.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Scripts/Triggers.sql" dialect="MySQL" />
+    <file url="PROJECT" dialect="MySQL" />
+  </component>
+</project>
