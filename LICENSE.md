@@ -1,5 +1,5 @@
-Copyright © 2025 Jose Ortiz Costa
+Copyright © 2025 Jaylin Jack
 
-This repository is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
-(CC BY-NC-ND 4.0). You may fork and modify the repository for the purposes of this class. Redistribution or public sharing 
-of this repository outside of this class is prohibited.
+This code is for personal portfolio and demonstration purposes only.
+You may view or fork this repository, but may not reuse, distribute,k or modify
+the code for commercial or academic purposes without explicit permission.
