@@ -276,7 +276,6 @@ CREATE TABLE IF NOT EXISTS Content_Release(
 DROP TABLE IF EXISTS ContentActors;
 CREATE TABLE IF NOT EXISTS ContentActors
 (
-
     content INT NOT NULL, -- PK/FK
     actor INT NOT NULL, -- PK/FK
     PRIMARY KEY (content, actor),

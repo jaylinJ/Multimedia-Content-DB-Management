@@ -6,10 +6,14 @@ COLLABORATORS: Jaylin Jack
 
 USE MultimediaContentDB;
 
-
+SELECT * FROM Actor WHERE actorID = 1;
 
 -- ------------------- TRIGGER TESTING BELOW ---------------------------
 -- 1. Limit Watchlist Capacity ❌
+Select * from Watchlist;
+
+
+
 
 -- 2. Rating Impact on Content_Availability
 /*

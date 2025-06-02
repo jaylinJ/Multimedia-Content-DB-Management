@@ -16,7 +16,7 @@ CREATE TRIGGER TRG_WATCHLISTHELPER AFTER INSERT ON Watchlist FOR EACH ROW
 
 
 DROP TRIGGER IF EXISTS TRG_WATCHLIST_CAPACITY_EXCEEDED$$
-CREATE TRIGGER TRG_WATCHLIST_CAPACITY_EXCEEDED AFTER INSERT ON WatchlistHelper FOR EACH ROW
+CREATE TRIGGER TRG_WATCHLIST_CAPACITY_EXCEEDED BEFORE INSERT ON WatchlistHelper FOR EACH ROW
     BEGIN
         DECLARE watchlist_count INT DEFAULT 0;
 
@@ -24,7 +24,9 @@ CREATE TRIGGER TRG_WATCHLIST_CAPACITY_EXCEEDED AFTER INSERT ON WatchlistHelper F
         FROM WatchlistHelper
         WHERE WatchlistHelper.user = NEW.user;
 
-        IF watchlist_count > 5 THEN
+
+
+        IF watchlist_count > 2 THEN
             DELETE FROM Watchlist WHERE user = NEW.user;
         END IF;
 
@@ -32,6 +34,7 @@ CREATE TRIGGER TRG_WATCHLIST_CAPACITY_EXCEEDED AFTER INSERT ON WatchlistHelper F
     END$$
 
 
+SELECT * FROM Watchlist;
 /*
     2. Rating Impact on Content Availability
     Automatically set the Content_Availability status to "Archived" if the average rating
@@ -79,3 +82,8 @@ END$$
 
 
 DELIMITER ;
+
+INSERT INTO Watchlist (user, content) VALUES (1, 1);
+INSERT INTO Watchlist (user, content) VALUES (1, 2);
+INSERT INTO Watchlist (user, content) VALUES (1, 3);
+INSERT INTO Watchlist (user, content) VALUES (1, 4);

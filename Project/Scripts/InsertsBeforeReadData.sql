@@ -38,6 +38,10 @@ INSERT INTO User ( name, email, password) VALUES ('tester', 'tester@mail.com', '
     Since our .csv file doesn't give us 1 genre, I create genres and assign them in the java file.
     NEEDS TO BE RAN BEFORE READDATA.JAVA
 */
+
+INSERT INTO Rating (ratingID, name) VALUES (1, 'NEEDS REVISION');
+
+INSERT INTO Director (directorID, name) VALUES (1, 'Multiple Directors');
 --  GENRE INSERTS
 INSERT INTO Genre (genreID, description) VALUES (1, 'Action');
 INSERT INTO Genre (genreID, description) VALUES (2, 'Cartoon');
