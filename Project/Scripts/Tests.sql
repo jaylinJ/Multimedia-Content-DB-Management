@@ -11,7 +11,8 @@ SELECT * FROM Actor WHERE actorID = 1;
 -- ------------------- TRIGGER TESTING BELOW ---------------------------
 -- 1. Limit Watchlist Capacity ✅
 
-
+CALL PRC_ENFORCE_WATCHLIST_LIMIT(2);
+SELECT * FROM Watchlist WHERE Watchlist.user = 2 ORDER BY Watchlist.watchlistID ASC;
 
 -- 2. Rating Impact on Content_Availability
 /*

@@ -4,7 +4,6 @@ DESCRIPTION: Trigger-Based Requirements
 COLLABORATORS: Jaylin Jack
 */
 
-SET GLOBAL event_scheduler = ON;
 
 USE MultimediaContentDB;
 
@@ -26,10 +25,10 @@ BEGIN
     FROM Watchlist
     WHERE user = user_id;
 
+    SET amount_over_limit = watchlist_count - 50;
     # If the count is greater than 50,
     # THEN delete the earliest rows until there is only 50 watchlist entries for the user.
     IF watchlist_count > 50 THEN
-        SET amount_over_limit = watchlist_count - 50;
 
         DELETE FROM Watchlist WHERE user = user_id
         ORDER BY Watchlist.watchlistID

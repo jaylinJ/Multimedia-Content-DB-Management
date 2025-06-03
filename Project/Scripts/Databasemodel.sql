@@ -240,7 +240,6 @@ CREATE TABLE IF NOT EXISTS Watchlist
     user INT NOT NULL, -- FK
     content INT NOT NULL, -- FK
     addedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('available', 'TO DELETE') NOT NULL DEFAULT 'available',
     CONSTRAINT fk_watchlist_user
         FOREIGN KEY (user) REFERENCES User(userID),
         -- After User is deleted the Watchlist is meaningless since it's made for the user.
@@ -391,8 +390,8 @@ CREATE TABLE IF NOT EXISTS ContentCountry
 DROP TABLE IF EXISTS Director_Assignment_Errors;
 CREATE TABLE IF NOT EXISTS Director_Assignment_Errors(
     director_assignment_errorID INT PRIMARY KEY AUTO_INCREMENT,
-    director INT NOT NULL , -- FK
     content INT NOT NULL , -- FK
+    director INT NOT NULL , -- FK
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_directorAssignmentErrors_content
         FOREIGN KEY (content) REFERENCES Content(contentID),
@@ -400,8 +399,3 @@ CREATE TABLE IF NOT EXISTS Director_Assignment_Errors(
         FOREIGN KEY (director) REFERENCES Director(directorID)
 );
 
-DROP TABLE IF EXISTS WatchlistDeleteHelper;
-CREATE TABLE IF NOT EXISTS WatchlistDeleteHelper(
-    watchlist_delete_helperID INT
-
-);
