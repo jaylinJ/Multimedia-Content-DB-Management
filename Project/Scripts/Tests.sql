@@ -9,9 +9,7 @@ USE MultimediaContentDB;
 SELECT * FROM Actor WHERE actorID = 1;
 
 -- ------------------- TRIGGER TESTING BELOW ---------------------------
--- 1. Limit Watchlist Capacity ❌
-Select * from Watchlist;
-
+-- 1. Limit Watchlist Capacity ✅
 
 
 
@@ -38,11 +36,12 @@ JOIN Content_Availability ON Content_Availability.content = Content.contentID
 WHERE Content_Availability.availability != 1;
 
 
--- TESTS FOR 3. ❌
-INSERT INTO ContentDirectors (content, director) VALUES (1, 1);
-INSERT INTO ContentDirectors (content, director) VALUES (1, 1);
+-- TESTS FOR 3. ✅
+CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(4, 2);
+SELECT * FROM Content WHERE contentID = 4;
+CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(4, 2);
+SELECT * FROM Content WHERE contentID = 4;
 
-SELECT * FROM ContentDirectors;
 SELECT * FROM Director_Assignment_Errors;
 -- ------------------- FUNCTION TESTING BELOW ---------------------------
 

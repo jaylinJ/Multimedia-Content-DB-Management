@@ -240,6 +240,7 @@ CREATE TABLE IF NOT EXISTS Watchlist
     user INT NOT NULL, -- FK
     content INT NOT NULL, -- FK
     addedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('available', 'TO DELETE') NOT NULL DEFAULT 'available',
     CONSTRAINT fk_watchlist_user
         FOREIGN KEY (user) REFERENCES User(userID),
         -- After User is deleted the Watchlist is meaningless since it's made for the user.
@@ -399,16 +400,8 @@ CREATE TABLE IF NOT EXISTS Director_Assignment_Errors(
         FOREIGN KEY (director) REFERENCES Director(directorID)
 );
 
-DROP TABLE IF EXISTS WatchlistHelper;
-CREATE TABLE IF NOT EXISTS WatchlistHelper(
-      watchlist_helperID INT PRIMARY KEY AUTO_INCREMENT,
-      user INT NOT NULL, -- FK
-      content INT NOT NULL, -- FK
-      addedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT fk_watchlistHelper_user
-          FOREIGN KEY (user) REFERENCES User(userID),
-
-      CONSTRAINT fk_watchlistHelper_content
-          FOREIGN KEY (content) REFERENCES Content(contentID)
+DROP TABLE IF EXISTS WatchlistDeleteHelper;
+CREATE TABLE IF NOT EXISTS WatchlistDeleteHelper(
+    watchlist_delete_helperID INT
 
 );

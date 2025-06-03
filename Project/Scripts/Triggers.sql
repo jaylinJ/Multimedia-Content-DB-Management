@@ -3,38 +3,42 @@ FILE: Triggers.sql
 DESCRIPTION: Trigger-Based Requirements
 COLLABORATORS: Jaylin Jack
 */
+
+SET GLOBAL event_scheduler = ON;
+
 USE MultimediaContentDB;
 
 DELIMITER $$
 
+/*
+    1. Limit Watchlist Capacity
+    Enforce a maximum of 50 items in a user's Watchlist.
+    Automatically remove the oldest item if the user adds an item exceeding the limit.
+*/
+DROP PROCEDURE IF EXISTS PRC_ENFORCE_WATCHLIST_LIMIT$$
+CREATE PROCEDURE IF NOT EXISTS PRC_ENFORCE_WATCHLIST_LIMIT(IN user_id INT)
+BEGIN
+    DECLARE watchlist_count INT;
+    DECLARE amount_over_limit INT;
 
-DROP TRIGGER IF EXISTS TRG_WATCHLISTHELPER$$
-CREATE TRIGGER TRG_WATCHLISTHELPER AFTER INSERT ON Watchlist FOR EACH ROW
-    BEGIN
-        INSERT INTO WatchlistHelper (user, content) VALUES (NEW.user, NEW.content);
-    END$$
+    # SELECT the count of the user from watchlist.
+    SELECT COUNT(Watchlist.user) INTO watchlist_count
+    FROM Watchlist
+    WHERE user = user_id;
+
+    # If the count is greater than 50,
+    # THEN delete the earliest rows until there is only 50 watchlist entries for the user.
+    IF watchlist_count > 50 THEN
+        SET amount_over_limit = watchlist_count - 50;
+
+        DELETE FROM Watchlist WHERE user = user_id
+        ORDER BY Watchlist.watchlistID
+        LIMIT amount_over_limit;
+    END IF;
 
 
-DROP TRIGGER IF EXISTS TRG_WATCHLIST_CAPACITY_EXCEEDED$$
-CREATE TRIGGER TRG_WATCHLIST_CAPACITY_EXCEEDED BEFORE INSERT ON WatchlistHelper FOR EACH ROW
-    BEGIN
-        DECLARE watchlist_count INT DEFAULT 0;
+END$$
 
-        SELECT COUNT(WatchlistHelper.user) INTO watchlist_count
-        FROM WatchlistHelper
-        WHERE WatchlistHelper.user = NEW.user;
-
-
-
-        IF watchlist_count > 2 THEN
-            DELETE FROM Watchlist WHERE user = NEW.user;
-        END IF;
-
-
-    END$$
-
-
-SELECT * FROM Watchlist;
 /*
     2. Rating Impact on Content Availability
     Automatically set the Content_Availability status to "Archived" if the average rating
@@ -61,29 +65,59 @@ CREATE TRIGGER IF NOT EXISTS TRG_RATING_ON_CONTENT_AVAILABILITY AFTER INSERT ON 
 
 
 -- 3. Ensure Unique Director for Content
-DROP TRIGGER IF EXISTS TRG_UNIQUE_DIRECTOR_FOR_CONTENT$$
-CREATE TRIGGER TRG_UNIQUE_DIRECTOR_FOR_CONTENT BEFORE INSERT ON ContentDirectors FOR EACH ROW
+
+DROP TRIGGER IF EXISTS TRG_UPDATE_CONTENT_DIRECTOR$$
+CREATE TRIGGER IF NOT EXISTS TRG_UPDATE_CONTENT_DIRECTOR AFTER INSERT ON ContentDirectors FOR EACH ROW
+    BEGIN
+        DECLARE current_director INT;
+
+        SELECT Content.director INTO current_director
+        FROM Content
+        WHERE Content.contentID = NEW.content;
+
+        IF current_director IS NULL OR current_director > 0 THEN
+            # IF the Content has a NULL director THEN change director to 'Multiple Directors'.
+            # DO the same if content has an initial director since there will be more directors.
+            UPDATE Content
+            SET director = 1
+            WHERE contentID = NEW.content;
+        END IF;
+    END $$
+
+# This function simply alerts the error.
+DROP FUNCTION IF EXISTS FNC_RETURN_CONTENT_DIRECTOR_ERROR $$
+CREATE FUNCTION IF NOT EXISTS FNC_RETURN_CONTENT_DIRECTOR_ERROR(msg VARCHAR(60)) RETURNS VARCHAR(60)
+    DETERMINISTIC
 BEGIN
-    DECLARE director_matches INT DEFAULT 0;
-
-    -- GET the count of directors
-    SELECT COUNT(director) INTO director_matches
-    FROM ContentDirectors
-    WHERE director = NEW.director AND content = NEW.content;
-
-    -- IF the director is already connected to the content then throw error.
-    IF director_matches > 0 THEN
-        -- LOG it first in our error table.
-        INSERT INTO Director_Assignment_Errors (director, content) VALUES (NEW.director, NEW.content);
-
-        SIGNAL SQLSTATE "45000" SET MESSAGE_TEXT = 'Director can not be associated with the same content twice.';
-    END IF;
+    RETURN msg;
 END$$
+
+
+DROP PROCEDURE IF EXISTS PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR$$
+CREATE PROCEDURE IF NOT EXISTS PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(IN content_id INT, director_id INT)
+    BEGIN
+        DECLARE director_matches INT DEFAULT 0;
+        DECLARE error_msg VARCHAR(60);
+
+        -- GET the count of directors
+        SELECT COUNT(director) INTO director_matches
+        FROM ContentDirectors
+        WHERE director = director_id AND content = content_id;
+
+        -- IF the director is already connected to the content then throw error.
+        IF director_matches > 0 THEN
+            -- LOG it first in our error table.
+            INSERT INTO Director_Assignment_Errors (content, director) VALUES (content_id, director_id);
+            SET error_msg = 'Director can not be associated with the same content twice.';
+            SELECT FNC_RETURN_CONTENT_DIRECTOR_ERROR(error_msg);
+        ELSE
+            # Otherwise INSERT INTO ContentDirectors.
+            INSERT INTO ContentDirectors (content, director) VALUES (content_id, director_id);
+        END IF;
+
+    end $$
 
 
 DELIMITER ;
 
-INSERT INTO Watchlist (user, content) VALUES (1, 1);
-INSERT INTO Watchlist (user, content) VALUES (1, 2);
-INSERT INTO Watchlist (user, content) VALUES (1, 3);
-INSERT INTO Watchlist (user, content) VALUES (1, 4);
+
