@@ -1,14 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/o2fYoNlo)
-# Csc675.775 Group Project
-
-**IMPORTANT: It is the student's responsibility to read and follow all guidelines and instructions provided in all 
-README files found in this repository.**
-
-## TODO by Team Lead
-
-1. Add all your team members as collaborators into this repository with `Write` permissions only.
-
-2. Please fill in the information below once the instructor creates teams for this project:
+![Project Flyer](Flyer.png-1.png)
 
 | Team Member | Student Name           | Email Address               | Role                    |
 |-------------|------------------------|-----------------------------|-------------------------|
