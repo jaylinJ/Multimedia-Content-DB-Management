@@ -1,3 +1,4 @@
+**I recieved a 20/20 with this project.**
 ![Project Flyer](Flyer.png-1.png)
 
 | Team Member | Student Name           | Email Address               | Role                    |
@@ -49,7 +50,6 @@ or assign additional tasks to ensure the team's success.
 
 
 --- 
-**I recieved a 20/20 with this project.**
 ## Repository Content
 
 All work in this repository is divided into four sections, which collectively account for 20% of your final grade. 
