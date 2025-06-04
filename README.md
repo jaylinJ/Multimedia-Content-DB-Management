@@ -1,6 +1,5 @@
-**I recieved a 20/20 with this project.**
 ![Project Flyer](Flyer.png-1.png)
-
+**I recieved a 20/20 with this project.**
 | Team Member | Student Name           | Email Address               | Role                    |
 |-------------|------------------------|-----------------------------|-------------------------|
 | 1           |        Jaylin Jack     |     jjack1@mail.sfsu.edu    | Team Lead               |
