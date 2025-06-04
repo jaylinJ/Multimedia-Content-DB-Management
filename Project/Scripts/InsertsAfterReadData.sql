@@ -63,6 +63,8 @@ INSERT INTO Watchlist (user, content) VALUES (2, 321);
 INSERT INTO Watchlist (user, content) VALUES (2, 323);
 INSERT INTO Watchlist (user, content) VALUES (2, 344);
 
+INSERT INTO Watchlist (user, content) VALUES (2, 378);
+INSERT INTO Watchlist (user, content) VALUES (2, 389);
 
 /*
     -> Essential for 4. Rank Top Genres By Watch Hours Testing

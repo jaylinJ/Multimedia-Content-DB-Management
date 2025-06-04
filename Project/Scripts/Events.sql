@@ -24,30 +24,6 @@ CREATE TABLE IF NOT EXISTS User_Notification(
         FOREIGN KEY (user) REFERENCES User(userID)
 );
 
-DROP EVENT IF EXISTS RemoveExpiredSubs$$
-CREATE EVENT IF NOT EXISTS RemoveExpiredSubs
-ON SCHEDULE EVERY 5 MINUTE
-STARTS (CURRENT_TIMESTAMP)
-DO
-    BEGIN
-        DECLARE noti VARCHAR(255);
-        SET noti = 'Your subscription has expired. Please Renew!';
-
-        -- INSERT all rows that return from expired User_Subscription INTO User_Notification
-        INSERT INTO User_Notification (user, notification)
-        SELECT user, noti
-        FROM User_Subscription
-        WHERE status = 'expired';
-
-        DELETE FROM User_Subscription WHERE status = 'expired';
-
-
-
-    END$$
-
-
-
-
 /*
     11. Refresh Popular Content Rankings
     Update a table storing the top 10 most popular Content for each Genre daily, based on view counts.
@@ -101,5 +77,44 @@ DO
 
     END$$
 
+
+/*
+    1. Monitor Watchlist for all users.
+    Enforce a maximum of 50 items in a user's Watchlist.
+    Automatically remove the oldest item if the user adds an item exceeding the limit.
+*/
+
+DROP EVENT IF EXISTS RemoveExceededWatchlistItems$$
+CREATE EVENT IF NOT EXISTS RemoveExceededWatchlistItems
+    ON SCHEDULE EVERY 1 MINUTE
+        STARTS (CURRENT_TIMESTAMP)
+    DO
+    BEGIN
+        DECLARE tmp_user_id INT;
+        DECLARE done BOOLEAN DEFAULT FALSE;
+
+        DECLARE tmp_user_cursor CURSOR FOR
+            SELECT User.userID
+            FROM User;
+
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+        OPEN tmp_user_cursor;
+
+        for_loop: LOOP
+            FETCH tmp_user_cursor INTO tmp_user_id;
+
+            IF done = TRUE THEN
+                LEAVE for_loop;
+            end if;
+
+            CALL PRC_ENFORCE_WATCHLIST_LIMIT(tmp_user_id);
+        end loop for_loop;
+        -- INSERT all rows that return from expired User_Subscription INTO User_Notification
+
+        CLOSE tmp_user_cursor;
+
+
+    END$$
 
 DELIMITER ;
