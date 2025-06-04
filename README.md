@@ -49,7 +49,7 @@ or assign additional tasks to ensure the team's success.
 
 
 --- 
-
+**I recieved a 20/20 with this project.**
 ## Repository Content
 
 All work in this repository is divided into four sections, which collectively account for 20% of your final grade. 
@@ -65,44 +65,6 @@ All work in this repository is divided into four sections, which collectively ac
 
 ---
 
-## Submission Guidelines
-
-For this project, you will be using various database tools and submitting your work through this repository.
-Ensure that all parts of the project are properly completed and uploaded before the submission deadline.
-Failure to follow the guidelines may result in a non-satisfactory grade.
-
-### General Guidelines:
-
-1. **Complete All Sections**: Ensure that all sections of the project are fully completed. Missing or incomplete work will result in a non-satisfactory grade for the project.
-   
-2. **Organize Files**: Upload all files to the appropriate folders in the repository. The required directories for the project are:
-   - `Project/Files/` for all required diagrams and documents
-   - `Project/Scripts/` for SQL scripts and any data processing scripts 
-   - `Project/Dataset/` for any datasets used to populate your database
-
-3. **Naming Conventions**:
-   - Ensure all files are named as specified in the project requirements (e.g., `Requirements.pdf`, `ERD.drawio`, `diagram.png`).
-   - Use appropriate file extensions for your scripts (e.g., `.sql`, `.py`, `.csv`).
-
-4. **Documentation**:
-   - Provide clear comments and documentation within your scripts, explaining the purpose and logic of your code.
-   - Include a README file in your repository if necessary to provide any additional information about your project.
-
-5. **Push to Remote Repository**: 
-   - After completing your work, ensure that all files are committed and pushed to the remote repository before the deadline.
-   
-6. **Late Submissions**:
-   - Late work won't be accepted. No exceptions.
-
-### Final Check:
-
-- Double-check that all required files and scripts are uploaded and are in their correct folders.
-- Confirm that your repository is up to date and includes all your final changes.
-
-
-
-
---- 
 
 ## Grading Rubrics
 
