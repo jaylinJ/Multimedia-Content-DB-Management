@@ -9,6 +9,74 @@ USE MultimediaContentDB;
 DELIMITER $$
 
 /*
+    1. Limit Watchlist Capacity
+    Enforce a maximum of 50 items in a user's Watchlist.
+    Automatically remove the oldest item if the user adds an item exceeding the limit.
+*/
+DROP PROCEDURE IF EXISTS PRC_ENFORCE_WATCHLIST_LIMIT$$
+CREATE PROCEDURE IF NOT EXISTS PRC_ENFORCE_WATCHLIST_LIMIT(IN user_id INT)
+BEGIN
+    DECLARE watchlist_count INT;
+    DECLARE amount_over_limit INT;
+
+    # SELECT the count of the user from watchlist.
+    SELECT COUNT(Watchlist.user) INTO watchlist_count
+    FROM Watchlist
+    WHERE user = user_id;
+
+    SET amount_over_limit = watchlist_count - 50;
+    # If the count is greater than 50,
+    # THEN delete the earliest rows until there is only 50 watchlist entries for the user.
+    IF watchlist_count > 50 THEN
+
+        DELETE FROM Watchlist WHERE user = user_id
+        ORDER BY Watchlist.watchlistID
+        LIMIT amount_over_limit;
+    END IF;
+
+
+END$$
+
+/*
+    3. Ensure Unique Director for Content
+    Prevent duplicate Director entries for the same Content.
+    Log any failed attempts to assign a duplicate director into a Director_Assignment_Errors table.
+*/
+
+# This function simply alerts the error.
+DROP FUNCTION IF EXISTS FNC_RETURN_CONTENT_DIRECTOR_ERROR $$
+CREATE FUNCTION IF NOT EXISTS FNC_RETURN_CONTENT_DIRECTOR_ERROR(msg VARCHAR(60)) RETURNS VARCHAR(60)
+    DETERMINISTIC
+BEGIN
+    RETURN msg;
+END$$
+
+
+DROP PROCEDURE IF EXISTS PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR$$
+CREATE PROCEDURE IF NOT EXISTS PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(IN content_id INT, director_id INT)
+BEGIN
+    DECLARE director_matches INT DEFAULT 0;
+    DECLARE error_msg VARCHAR(60);
+
+    -- GET the count of directors
+    SELECT COUNT(director) INTO director_matches
+    FROM ContentDirectors
+    WHERE director = director_id AND content = content_id;
+
+    -- IF the director is already connected to the content then throw error.
+    IF director_matches > 0 THEN
+        -- LOG it first in our error table.
+        INSERT INTO Director_Assignment_Errors (content, director) VALUES (content_id, director_id);
+        SET error_msg = 'Director can not be associated with the same content twice.';
+        SELECT FNC_RETURN_CONTENT_DIRECTOR_ERROR(error_msg);
+    ELSE
+        # Otherwise INSERT INTO ContentDirectors.
+        INSERT INTO ContentDirectors (content, director) VALUES (content_id, director_id);
+    END IF;
+
+end $$
+
+/*
     7. Generate Monthly User Activity Report
     Generate a report detailing user activity for the past month, including:
         - The number of content items watched
@@ -129,6 +197,11 @@ BEGIN
 
 END$$
 
+/*
+    9. Handle Failed Payments
+    Log failed payment attempts into a Payment_Errors table.
+    Send notifications to affected users regarding the failed payments.
+*/
 
 DROP PROCEDURE IF EXISTS PRC_FAILED_PAYMENT_FOR_USERS$$
 CREATE PROCEDURE IF NOT EXISTS PRC_FAILED_PAYMENT_FOR_USERS()

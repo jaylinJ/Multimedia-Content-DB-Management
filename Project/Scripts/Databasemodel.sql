@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `Release`
 (
     releaseID INT PRIMARY KEY AUTO_INCREMENT,
     release_date DATE NOT NULL,
-    version INT
+    version INT DEFAULT 1
 );
 
 

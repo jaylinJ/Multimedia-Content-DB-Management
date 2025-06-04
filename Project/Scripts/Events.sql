@@ -79,9 +79,8 @@ DO
 
 
 /*
-    1. Monitor Watchlist for all users.
-    Enforce a maximum of 50 items in a user's Watchlist.
-    Automatically remove the oldest item if the user adds an item exceeding the limit.
+    This Scheduled Event Automatically Checks All User's Watchlist.
+    Enforcing the cleanup if necessary every minute.
 */
 
 DROP EVENT IF EXISTS CheckAllUsersWatchlist$$

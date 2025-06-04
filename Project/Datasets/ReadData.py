@@ -2,8 +2,13 @@
 File: ReadData.py
 Description: Python file used to properly parse 8807 rows of MultimediaContentData and populate DB tables.
 TABLES POPULATED WITH THIS FILE:
-Content, Director, Country, Actors, Release, Tags, ContentTags, GenreTags
-ContentActors, ContentCountry, Content_Availability, Content_Release, Rating
+Content, Director, Country, Actors, Release, Tags, Rating
+ContentDirectors, ContentTags, GenreTags, ContentActors, ContentCountry, Content_Availability, Content_Release
+
+WORK CITED:
+https://www.w3schools.com/sql/func_mysql_date_format.asp
+
+Collaborators: Jaylin Jack
 '''
 
 
@@ -11,36 +16,52 @@ ContentActors, ContentCountry, Content_Availability, Content_Release, Rating
 import numpy as np
 import pandas as pd
 import mysql.connector
-from datetime import datetime, date
+from datetime import datetime
+
 
 mydb = mysql.connector.connect(
-  host= "localhost",
-  user= "root",
-  password= "Jade",
-  database= "MultimediaContentDB"
+    host= "localhost",
+    user= "root", # TO CHANGE
+    password= "Jade",  # TO CHANGE
+    database= "MultimediaContentDB"
 )
 
 mycursor = mydb.cursor()
 
+# Assigns the genre depending on Content ID.
+# Content is given a random Genre.
 def get_genre(num):
     num = int(num)
     num = (num % 9) + 1
     return num
 
+# Remove the 's' from ID in our csv file.
 def truncate_id(show_id):
     show_id = show_id[1:]
     return show_id
 
+
+# Changes our date from Month Day, Year to YYYY-MM-DD Format for MySQL Date INSERT.
 def fix_date_format(date):
     if date == "NULL":
         return None
 
     date = date.strip()
+
+    # Make our passed in Date a DATETIME value.
     date = datetime.strptime(date, "%B %d, %Y")
+
+    # THEN Set our date into DATE format.
     date = date.strftime("%Y-%m-%d")
 
+    # INSERT the Date and get it's releaseID.
     date_id = get_id_or_insert_release(date, release_map)
     return date_id
+
+'''
+    All transform_[entity]_row Functions have their own error and NULL handling cases
+    If the column contains multiple values I parse by the comma and insert each value.
+'''
 
 def transform_actor_row(row):
     if row == "NULL":
@@ -65,6 +86,7 @@ def transform_director_row(row):
 
     if ',' not in row:
         if len(row) > 100:
+            row = str(row)
             director_id = get_id_or_insert_country(row, director_map)
             return director_id
 
@@ -110,13 +132,16 @@ def transform_country_row(row):
 
 def transform_rating_row(row):
     if row == "NULL":
-        return 1
+        return None
 
     if ',' not in row:
         rating_id = get_id_or_insert_rating(row, rating_map)
         return rating_id
 
+    return None
 
+# Some of the methods I use make ID values Floats instead of INT.
+# So I just get the INT value and return it.
 def remove_decimal(row):
     if row == "NULL":
         return None
@@ -126,6 +151,21 @@ def remove_decimal(row):
         row = row[:row.index('.')]
         return row
 
+
+
+'''
+    All get_[entity]_or_insert Functions simply take the name/description of the entity
+    and INSERT them into the proper table.
+
+    There are SELECT statements to handle any duplicate entries.
+
+    But I use a map that saves the name/description for each unique ID
+    for most entities to cut down the query time.
+
+    I was running into issues where the map may not contain the right value at runtime so,
+    I added SELECT statements to handle any duplicate entries that are not vaught by the map.
+
+'''
 
 # Needs work, some content contains multiple directors.
 def get_id_or_insert_director(name, director_map):
@@ -302,40 +342,61 @@ def get_id_or_insert_actor(name, actor_map):
     actor_map[name] = actor_id
     return actor_id
 
-# GET/INSERT TODO:
-
+# insert_content has to insert all values needed for content
+# (contentID, format, title, director, release_year, rating, duration, description, genre)
 def insert_content(row):
+
     row = list(row)
-    content_id = row[0]
-    if row[3] == "NULL":
-        row[3] = None
 
 
+    # Assign each variable it's value in the passed in list.
+    content_id ,content_format_id, title, director, release_year, rating, duration, description, genre \
+        = row[0],row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]
 
-    director = 1
+    if director == "NULL":
+        director = None
+
     list_helper = []
 
-    if row[5] == "NULL":
-        row[5] = director
+    # If rating is NULL then we assign it our 'NEEDS REVISION' rating value from "InsertsBeforeReadData.sql"
+    if rating == "NULL":
+        needs_revision = 1
+        rating = needs_revision
 
 
-    if isinstance(row[3], list):
-        # save our list into our helper for later A.E implementation
-        list_helper = row[3]
-        row[3] = director
+    # if Director is a list instead of a single string.
+    # Then we need to insert into our Associative Entity: Content_Directors
+    # We assign the director value of 1
+    # Because in our "InsertsBeforeReadData.sql" we set director 1 = 'Multiple Directors'.
+    if isinstance(director, list):
+        # make director just a string.
+        if len(director) == 1:
+            director = str(row[3][0])
+        else:
+            # save our list into our helper for later A.E implementation
+            director = 1
+            list_helper = row[3]
+
+
+
 
     sql = ("SELECT contentID FROM Content WHERE contentID = %s")
     mycursor.execute(sql, (row[0],))
     rs = mycursor.fetchone()
 
+    # If content exists already then skip.
     if rs:
         return None
 
-    genre = get_genre(row[0])
+
+    # Get_Genre simply assigns the content a genre depending on contentID % 9
+    genre = get_genre(genre)
+
+
     sql = ("INSERT INTO Content (contentID, format, title, director,"
            "release_year, rating, duration, description, genre) "
            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
-    val = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], genre)
+    val = (content_id, content_format_id, title, director, release_year, rating, duration, description, genre)
     mycursor.execute(sql, val)
     mydb.commit()
 
@@ -349,13 +410,31 @@ def insert_content(row):
     print("Content_Availability Record Inserted.")
 
     # If our director value was a list:
-        # WE need to insert the M:M relationship for Content and Director
-        # into the respective Associative Entity Table "ContentDirectors"
-    if row[3] == director:
+    # WE need to insert the M:M relationship for Content and Director
+    # into the respective Associative Entity Table "ContentDirectors"
+    if director == 1:
         insert_content_directors(content_id, list_helper)
 
     return content_id
 
+# This function is used to test Business Requirement 11.
+# Simply INSERT a Watch_History for a user.
+def insert_watch_history_for_user(content_id, user_id):
+
+
+
+    sql = ("INSERT INTO Watch_History (content, user) VALUES (%s, %s)")
+    val = (content_id, user_id)
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    print("WatchHistory Record Inserted for User: ", user_id , " & Content: ", content_id)
+
+
+'''
+    BELOW are INSERTS for our Associative Entities (Many-to-Many Relationships)
+    Simply for each value existent in the list passed in just INSERT into respective tables.
+'''
 def insert_content_directors(content_id, director_list):
 
     for director_id in director_list:
@@ -415,27 +494,23 @@ def insert_content_country(content_id, country_list):
 
             print("ContentCountry Record Inserted.")
 
-def insert_content_release(content_id, release_list):
-
-    if isinstance(release_list, int):
-        release_list = [release_list]
+def insert_content_release(content_id, release_id):
 
 
-    for release_id in release_list:
-        sql = ("SELECT 1 FROM Content_Release WHERE content = %s AND `release` = %s")
-        mycursor.execute(sql, (content_id, release_id))
-        rs = mycursor.fetchone()
+    sql = ("SELECT 1 FROM Content_Release WHERE content = %s AND `release` = %s")
+    mycursor.execute(sql, (content_id, release_id))
+    rs = mycursor.fetchone()
 
-        if rs:
-            print("Content Release", content_id, release_id, " Already Exists.")
-        else:
-            print("Content Release", content_id, release_id, " NEW")
-            sql = ("INSERT INTO Content_Release (content, `release`) VALUES (%s, %s)")
-            val = (content_id, release_id)
-            mycursor.execute(sql, val)
-            mydb.commit()
+    if rs:
+        print("Content Release", content_id, release_id, " Already Exists.")
+    else:
+        print("Content Release", content_id, release_id, " NEW")
+        sql = ("INSERT INTO Content_Release (content, `release`) VALUES (%s, %s)")
+        val = (content_id, release_id)
+        mycursor.execute(sql, val)
+        mydb.commit()
 
-            print("ContentRelease Record Inserted.")
+        print("ContentRelease Record Inserted.")
 
 def insert_content_tag(content_id, tag_list):
 
@@ -479,47 +554,53 @@ def insert_genre_tag(genre_id, tag_list):
 
             print("GenreTags Record Inserted.")
 
+
+
+
 (director_map, rating_map, tag_map, release_map,
-country_map, content_format_map, actor_map, content_director_map,
+ country_map, content_format_map, actor_map, content_director_map,
  content_actor_map)  = {}, {}, {}, {}, {}, {}, {}, {}, {}
 
+
 df = pd.read_csv('Data.csv')
+
+# Replace nan values with 'NULL' for MySQL INSERTS.
 df = df.replace(np.nan, 'NULL')
+
 # Remove the 's' from the id in Data.csv
 df['show_id'] = df['show_id'].apply(truncate_id)
-
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', None)
-pd.set_option('display.max_colwidth', None)
 
 
 
 for row in df['type']:
     if row != 'NULL':
-         get_id_or_insert_format(row, content_format_map)
+        get_id_or_insert_format(row, content_format_map)
 
 
 
 
-
+# Use our content_format_map to populate Content_Format with the proper ID values.
 df['type'] = df['type'].map(content_format_map).fillna('NULL')
+
+# Apply respective transform_[entity] functions
 df['director'] = df['director'].apply(transform_director_row).fillna('NULL')
 df['listed_in'] = df['listed_in'].apply(transform_tag_row).fillna('NULL')
-
-df['rating'] = df['rating'].apply(transform_rating_row).fillna('NULL')
-df['rating'] = df['rating'].apply(remove_decimal).fillna('NULL')
-
-df['date_added'] = df['date_added'].apply(fix_date_format).fillna('NULL')
-df['date_added'] = df['date_added'].apply(remove_decimal).fillna('NULL')
-
 df['cast'] = df['cast'].apply(transform_actor_row).fillna('NULL')
 df['country'] = df['country'].apply(transform_country_row).fillna('NULL')
 
+df['rating'] = df['rating'].map(transform_rating_row).fillna('NULL')
+df['rating'] = df['rating'].apply(remove_decimal).fillna('NULL')
+
+# Get rid of float values after fixing the date to MySQL DATE Format.
+df['date_added'] = df['date_added'].apply(fix_date_format).fillna('NULL')
+df['date_added'] = df['date_added'].apply(remove_decimal).fillna('NULL')
+
+#genre can just
 genre_column = df['show_id'].copy()
 genre_column = genre_column.astype(int)
 genre_column = genre_column.apply(get_genre).fillna('NULL')
 content = list(zip(df['show_id'], df['type'], df['title'], df['director'],
-               df['release_year'], df['rating'], df['duration'], df['description'], genre_column))
+                   df['release_year'], df['rating'], df['duration'], df['description'], genre_column))
 
 
 content_actor = list(zip(df['show_id'], df['cast']))
@@ -531,13 +612,15 @@ genre_tag = list(zip(genre_column, df['listed_in']))
 for row in content:
     insert_content(row)
 
-
 # At This Point, The Tables Populated ARE:
-    # Content, Actor, Director, Rating, Country, Release, Content_Format, Content_Directors
+# Content, Actor, Director, Rating, Country, Release, Content_Format, Content_Directors
 
-# IMPLEMENT the Associative Entities.
-# GenreTags
 
+
+
+# Run INSERTS for all rows to populate our Associative Entities.
+# insert_content handles ContentDirectors & Content_Availability
+# ContentActors, ContentCountry, Content_Release, ContentTags, GenreTags
 for row in content_actor:
     content_id = row[0]
     actor_list = row[1]
@@ -550,11 +633,11 @@ for row in content_country:
     if country_list != 'NULL':
         insert_content_country(content_id, country_list)
 
-# for row in content_release:
-#     content_id = row[0]
-#     release_list = row[1]
-#     if release_list != 'NULL':
-#         insert_content_release(content_id, release_list)
+for row in content_release:
+    content_id = row[0]
+    release_list = row[1]
+    if release_list != 'NULL':
+        insert_content_release(content_id, release_list)
 
 for row in content_tag:
     content_id = row[0]
@@ -567,3 +650,15 @@ for row in genre_tag:
     tag_list = row[1]
     if tag_list != 'NULL':
         insert_genre_tag(genre_id, tag_list)
+
+# INSERT WatchHistory for User 1 Twice.
+for row in content:
+    content_id = row[0]
+    content_id = int(content_id)
+    if content_id < 4000:
+        # I just simply want the tester user to watch half of the content twice.
+        # THIS is for 11. testing.
+        insert_watch_history_for_user(content_id, 1)
+        insert_watch_history_for_user(content_id, 1)
+
+
