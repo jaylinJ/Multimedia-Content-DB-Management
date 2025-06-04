@@ -84,8 +84,8 @@ DO
     Automatically remove the oldest item if the user adds an item exceeding the limit.
 */
 
-DROP EVENT IF EXISTS RemoveExceededWatchlistItems$$
-CREATE EVENT IF NOT EXISTS RemoveExceededWatchlistItems
+DROP EVENT IF EXISTS CheckAllUsersWatchlist$$
+CREATE EVENT IF NOT EXISTS CheckAllUsersWatchlist
     ON SCHEDULE EVERY 1 MINUTE
         STARTS (CURRENT_TIMESTAMP)
     DO
@@ -95,7 +95,8 @@ CREATE EVENT IF NOT EXISTS RemoveExceededWatchlistItems
 
         DECLARE tmp_user_cursor CURSOR FOR
             SELECT User.userID
-            FROM User;
+            FROM Watchlist
+            JOIN User ON User.userID = Watchlist.user;
 
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
