@@ -163,9 +163,8 @@ public class ReadData {
                 contentRow.add(getEntireLine(l1));
                 break;
             case director:
-                // IF there is ever more than 1 director, I am making it NULL.
-                contentRow.add("NULL");
-                break;
+                // Assign director value 1 "Multiple Directors" value.
+                contentRow.add("1");
             case cast:
             case genre:
                 l1.add(value);
@@ -181,10 +180,12 @@ public class ReadData {
 
     }
 
-    // This function generates a random number between 1-9 for GenreID 1-9.
-    public static String randomGenre(){
-        int randomNum = (int) (Math.random() * 9) + 1;
-        return (String.valueOf(randomNum));
+    // Assigns the genre depending on Content ID.
+    // Content is given a random Genre.
+    public static String randomGenre(String content_id){
+        int id = Integer.parseInt(content_id);
+        int genre = (id % 9) + 1;
+        return (String.valueOf(genre));
     }
 
     /*
@@ -310,12 +311,12 @@ public class ReadData {
 
     }
 
-    public static int getDirectorID_or_INSERT(HashMap<String, Integer> director_map, String directorDescription, Connection conn) {
+    public static int getDirectorID_or_INSERT(HashMap<String, Integer> director_map, String directorName, Connection conn) {
 
 
         // 1.
-        if (director_map.containsKey(directorDescription)) {
-            return director_map.get(directorDescription);
+        if (director_map.containsKey(directorName)) {
+            return director_map.get(directorName);
         }
 
 
@@ -327,7 +328,7 @@ public class ReadData {
 
         try (PreparedStatement findDirector = conn.prepareStatement(checkQuery)) {
             // 2.
-            findDirector.setString(1, directorDescription);
+            findDirector.setString(1, directorName);
 
 
             try (ResultSet result = findDirector.executeQuery()) {
@@ -335,7 +336,7 @@ public class ReadData {
                 if (!result.next()) {
                     try (PreparedStatement insertDirector = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                         // 3.
-                        insertDirector.setString(1, directorDescription);
+                        insertDirector.setString(1, directorName);
 
                         int rowsAffected = insertDirector.executeUpdate();
 
@@ -344,7 +345,7 @@ public class ReadData {
                             ResultSet generatedKeys = insertDirector.getGeneratedKeys();
                             if (generatedKeys.next()) {
                                 int directorID = generatedKeys.getInt(1);
-                                director_map.put(directorDescription, directorID);
+                                director_map.put(directorName, directorID);
                                 return directorID;
                             }
                         }
@@ -352,7 +353,7 @@ public class ReadData {
                 } else {
                     // 2A.
                     int directorID = result.getInt("directorID");
-                    director_map.put(directorDescription, directorID);
+                    director_map.put(directorName, directorID);
 
 
                     return directorID;
@@ -822,6 +823,46 @@ public class ReadData {
 
     }
 
+    public static void insertContent_Directors(String contentID, int directorID, Connection conn){
+
+        String insertQuery = "INSERT INTO ContentDirectors (content, director) VALUES (?, ?)";
+
+
+        String checkQuery = "SELECT 1 FROM ContentDirectors WHERE content = ? AND director = ?";
+
+
+
+        try (PreparedStatement findContentAvailability = conn.prepareStatement(checkQuery)) {
+
+            // SELECT 1 FROM Content_Availability Where content = contentID AND availability = 1;
+            findContentAvailability.setString(1, contentID);
+            findContentAvailability.setInt(2, directorID);
+
+            try (ResultSet result = findContentAvailability.executeQuery()) {
+
+                if (!result.next()) {
+                    try (PreparedStatement insertContentAvailability = conn.prepareStatement(insertQuery)) {
+                        // INSERT INTO ContentAvailability (content, availability) VALUES (contentID, 1);
+                        insertContentAvailability.setString(1, contentID);
+                        insertContentAvailability.setInt(2, directorID);
+
+                        int rowsAffected = insertContentAvailability.executeUpdate();
+
+                        if (rowsAffected > 0) {
+                            System.out.println("Content_Directors inserted successfully");
+                        }
+
+
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
     public static void insertContent_Release(String contentID, int releaseID, Connection conn){
         String insertQuery = "INSERT INTO Content_Release (content, `release`) VALUES (?, ?)";
 
@@ -904,8 +945,7 @@ public class ReadData {
                         while (i < l1.size()) {
                             if (l1.get(i).equals("NULL")){
                                 insertContent.setNull(i + 1, java.sql.Types.INTEGER);
-
-                            }else {
+                            }else{
                                 insertContent.setString(i + 1, l1.get(i));
                             }
 
@@ -969,12 +1009,14 @@ public class ReadData {
 
         List<String> contentRow = new ArrayList<>();
         List<String> contentActors = new ArrayList<>();
+        List<String> contentDirectors = new ArrayList<>();
         List<String> contentTags = new ArrayList<>();
         List<String> genreTags = new ArrayList<>();
         List<String> contentCountry = new ArrayList<>();
         List<String> contentDate = new ArrayList<>();
         List<List<String>> contentHelper = new ArrayList<>();
         List<List<String>> actorHelper = new ArrayList<>();
+        List<List<String>> contentDirectorsHelper = new ArrayList<>();
         List<List<String>> contentTagsHelper = new ArrayList<>();
         List<List<String>> genreTagsHelper = new ArrayList<>();
         List<List<String>> countryHelper = new ArrayList<>();
@@ -997,8 +1039,9 @@ public class ReadData {
         HashMap<String, Integer> country_map = new HashMap<>();
         HashMap<String, Integer> date_map = new HashMap<>();
 
-        // Rating I created for content that don't have a Rating in the CSV File.
+        // Rating & Director I created for content that don't have a Rating in the CSV File.
         rating_map.put("NEEDS REVISION", 1);
+        director_map.put("Multiple Directors", 1);
 
 
         String dbUrl = "jdbc:mysql://localhost:3306/MultimediaContentDB";
@@ -1153,6 +1196,10 @@ public class ReadData {
 
                             columnSwitch(itr, contentRow, l1, value);
 
+                            if (itr == director) {
+                                contentDirectors.addAll(l1);
+                            }
+
                             if (itr == cast) {
                                 contentActors.addAll(l1);
                             }
@@ -1160,7 +1207,7 @@ public class ReadData {
                             if (itr == genre){
                                 contentTags.addAll(l1);
 
-                                String randomGenre = randomGenre();
+                                String randomGenre = randomGenre(contentRow.get(0));
                                 genreTags.add(randomGenre);
                                 genreTags.addAll(l1);
                                 contentRow.add(randomGenre);
@@ -1200,6 +1247,7 @@ public class ReadData {
                                     contentTags.add(value);
                                     contentCountry.add(value);
                                     contentDate.add(value);
+                                    contentDirectors.add(value);
                                     break;
                                 // Content_Format column
                                 case contentFormat:
@@ -1272,7 +1320,7 @@ public class ReadData {
 
                                     contentTags.add(value);
 
-                                    String randomGenre = randomGenre();
+                                    String randomGenre = randomGenre(contentRow.get(0));
                                     genreTags.add(randomGenre);
                                     genreTags.add(value);
                                     contentRow.add(randomGenre);
@@ -1330,6 +1378,10 @@ public class ReadData {
                         if (!contentDate.contains("NULL")){
                             dateHelper.add(new ArrayList<>(contentDate));
                         }
+
+                        if (!contentDirectors.contains("NULL")){
+                            contentDirectorsHelper.add(new ArrayList<>(contentDirectors));
+                        }
                     }
 
                     // EMPTY all List<> since they are only useful for this current line.
@@ -1339,6 +1391,7 @@ public class ReadData {
                     genreTags.clear();
                     contentCountry.clear();
                     contentDate.clear();
+                    contentDirectors.clear();
 
                 }
 
@@ -1466,6 +1519,21 @@ public class ReadData {
 
                         if (tagID != -1){
                             insertGenreTags(genreID, tagID, conn);
+                        }
+
+                    }
+                }
+
+                for (int index = 0; index < contentDirectorsHelper.size(); index++){
+                    String contentID = contentDirectorsHelper.get(index).get(0).trim();
+
+                    for (int j = 1; j < contentDirectorsHelper.get(index).size(); j++) {
+                        String directorName = contentDirectorsHelper.get(index).get(j);
+                        String directorNameTrimmed = directorName.trim();
+                        int directorID = getDirectorID_or_INSERT(director_map, directorNameTrimmed, conn);
+
+                        if (directorID != -1){
+                            insertContent_Directors(contentID, directorID, conn);
                         }
 
                     }

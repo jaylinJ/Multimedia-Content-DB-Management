@@ -6,6 +6,7 @@ COLLABORATORS: Jaylin Jack
 
 USE MultimediaContentDB;
 
+SELECT * FROM ContentDirectors;
 -- ------------------- TRIGGER TESTING BELOW ---------------------------
 -- 1. Limit Watchlist Capacity ✅
 CALL PRC_ENFORCE_WATCHLIST_LIMIT(2);
