@@ -1,11 +1,11 @@
 ![Project Flyer](Flyer.png-1.png)
 **I recieved a 20/20 with this project.**
-| Team Member | Student Name           | Email Address               | Role                    |
-|-------------|------------------------|-----------------------------|-------------------------|
-| 1           |        Jaylin Jack     |     jjack1@mail.sfsu.edu    | Team Lead               |
-| 2           |     Jaylin Jack        |    jjack1@mail.sfsu.edu     | Database Architect      |
-| 3           |        Jaylin Jack     |    jjack1@mail.sfsu.edu     |     Database Developer      |
-| 4           |            Jaylin Jack |    jjack1@mail.sfsu.edu     | Database Analyst/Tester |
+| Team Member | Student Name           | Role                    |
+|-------------|------------------------|-----------------------------|
+| 1           |        Jaylin Jack     |Team Lead               |
+| 2           |     Jaylin Jack        |    Database Architect      |
+| 3           |        Jaylin Jack     |         Database Developer      |
+| 4           |            Jaylin Jack |     Database Analyst/Tester |
 
 
 --- 
