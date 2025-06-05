@@ -139,7 +139,6 @@ Using **DataGrip**, create and implement four SQL scripts as follows:
 
 The following business requirements must be implemented in the appropriate scripts:
 
-### Trigger-Based Requirements
 
 #### 1. Limit Watchlist Capacity
 - Enforce a maximum of 50 items in a user's **Watchlist**. 
@@ -152,8 +151,6 @@ The following business requirements must be implemented in the appropriate scrip
 - Prevent duplicate **Director** entries for the same **Content**.
 - Log any failed attempts to assign a duplicate director into a `Director_Assignment_Errors` table.
 
-### Function-Based Requirements
-
 #### 4. Rank Top Genres by Watch Hours
 - Return the top 3 genres based on total watch hours in the last month.
 
@@ -162,8 +159,6 @@ The following business requirements must be implemented in the appropriate scrip
 
 #### 6. Validate Subscription Status
 - Return whether a user’s subscription is **active** or **expired** based on their subscription and transaction history.
-
-### Procedure-Based Requirements
 
 #### 7. Generate Monthly User Activity Report
 - Generate a report detailing user activity for the past month, including:
@@ -177,8 +172,6 @@ The following business requirements must be implemented in the appropriate scrip
 #### 9. Handle Failed Payments
 - Log failed payment attempts into a `Payment_Errors` table.
 - Send notifications to affected users regarding the failed payments.
-
-### Scheduled Event Requirements
 
 #### 10. Remove Expired Subscriptions
 - Automatically remove expired subscriptions from the **User_Subscription** table.
