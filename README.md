@@ -1,5 +1,6 @@
 ![Project Flyer](Flyer.png-1.png)
-**I recieved a 20/20 with this project.**
+**I recieved a 20/20 with this project**
+**This was also a group project that was done solo. 😁**
 | Team Member | Student Name           | Role                    |
 |-------------|------------------------|-----------------------------|
 | 1           |        Jaylin Jack     |Team Lead               |
