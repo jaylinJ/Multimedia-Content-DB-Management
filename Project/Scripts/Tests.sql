@@ -6,12 +6,8 @@ COLLABORATORS: Jaylin Jack
 
 USE MultimediaContentDB;
 
-SELECT * FROM ContentDirectors;
--- ------------------- TRIGGER TESTING BELOW ---------------------------
--- 1. Limit Watchlist Capacity ✅
-CALL PRC_ENFORCE_WATCHLIST_LIMIT(2);
-SELECT * FROM Watchlist WHERE Watchlist.user = 2 ORDER BY Watchlist.watchlistID ASC;
 
+-- ------------------- TRIGGER TESTING BELOW ---------------------------
 -- 2. Rating Impact on Content_Availability
 /*
  The 2 Review INSERTS make the avg rating value of Content 1 less than 2.
@@ -36,23 +32,7 @@ JOIN Content_Availability ON Content_Availability.content = Content.contentID
 WHERE Content_Availability.availability = 2;
 
 
--- TESTS FOR 3. ✅
 
--- INSERT ContentDirector for Content 5 and Director 4.
-CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(5, 4);
-SELECT * FROM Content WHERE contentID = 5;
-
--- Now ContentDirector with the same value should return the error
-CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(5, 4);
-
--- Make sure Content has only unique directors.
-SELECT Director.name AS 'Director'
-FROM ContentDirectors
-JOIN Director ON Director.directorID = ContentDirectors.director
-WHERE Director.directorID = 5;
-
--- LOG Director Assignment Errors
-SELECT * FROM Director_Assignment_Errors;
 -- ------------------- FUNCTION TESTING BELOW ---------------------------
 
 
@@ -80,6 +60,28 @@ SELECT FNC_VALIDATE_USER_SUBSCRIPTION(3);
 SELECT FNC_VALIDATE_USER_SUBSCRIPTION(4);
 
 -- ------------------- PROCEDURE TESTING BELOW ---------------------------
+
+-- 1. Limit Watchlist Capacity ✅
+CALL PRC_ENFORCE_WATCHLIST_LIMIT(2);
+SELECT * FROM Watchlist WHERE Watchlist.user = 2 ORDER BY Watchlist.watchlistID ASC;
+
+-- TESTS FOR 3. ✅
+
+-- INSERT ContentDirector for Content 5 and Director 4.
+CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(5, 4);
+SELECT * FROM Content WHERE contentID = 5;
+
+-- Now ContentDirector with the same value should return the error
+CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(5, 4);
+
+-- Make sure Content has only unique directors.
+SELECT Director.name AS 'Director'
+FROM ContentDirectors
+         JOIN Director ON Director.directorID = ContentDirectors.director
+WHERE Director.directorID = 5;
+
+-- LOG Director Assignment Errors
+SELECT * FROM Director_Assignment_Errors;
 
 -- 7. Generate Monthly User Activity Report ✅
 -- User 1 should have thousands of content watched since we populate it's watch-history using ReadData.
