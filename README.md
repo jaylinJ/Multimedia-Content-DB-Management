@@ -9,3 +9,5 @@
 | 3           |        Jaylin Jack     |         Database Developer      |
 | 4           |            Jaylin Jack |     Database Analyst/Tester |
 
+**STEPS TO RUN:**
+![Project Flyer](Final Project Steps.pdf)
