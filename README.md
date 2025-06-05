@@ -10,4 +10,5 @@
 | 4           |            Jaylin Jack |     Database Analyst/Tester |
 
 **STEPS TO RUN:**
-![Project Flyer](Final Project Steps.pdf)
+
+![Project Flyer](Final_Project_Steps-1.png)
