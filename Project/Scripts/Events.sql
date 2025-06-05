@@ -24,6 +24,29 @@ CREATE TABLE IF NOT EXISTS User_Notification(
         FOREIGN KEY (user) REFERENCES User(userID)
 );
 
+-- REMOVE Expired Subscriptions DAILY.
+DROP EVENT IF EXISTS RemoveExpiredSubs$$
+CREATE EVENT IF NOT EXISTS RemoveExpiredSubs
+    ON SCHEDULE EVERY 1 DAY
+        STARTS (CURRENT_TIMESTAMP)
+    DO
+    BEGIN
+        DECLARE noti VARCHAR(255);
+        SET noti = 'Your subscription has expired. Please Renew!';
+
+        -- INSERT all rows that return from expired User_Subscription INTO User_Notification
+        INSERT INTO User_Notification (user, notification)
+        SELECT user, noti
+        FROM User_Subscription
+        WHERE status = 'expired';
+
+        DELETE FROM User_Subscription WHERE status = 'expired';
+
+
+
+    END$$
+
+
 /*
     11. Refresh Popular Content Rankings
     Update a table storing the top 10 most popular Content for each Genre daily, based on view counts.

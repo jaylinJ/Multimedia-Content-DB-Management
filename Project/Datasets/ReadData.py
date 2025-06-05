@@ -655,7 +655,7 @@ for row in genre_tag:
 for row in content:
     content_id = row[0]
     content_id = int(content_id)
-    if content_id < 4000:
+    if content_id > 4000:
         # I just simply want the tester user to watch half of the content twice.
         # THIS is for 11. testing.
         insert_watch_history_for_user(content_id, 1)

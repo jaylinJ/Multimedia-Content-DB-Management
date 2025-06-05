@@ -77,9 +77,9 @@ INSERT INTO Watchlist (user, content) VALUES (2, 389);
 
 -- WATCH_HISTORY INSERTS FOR PROCEDURE #7
 INSERT INTO Watch_History (user, content, watch_date) VALUES
-(1, 1, CURRENT_TIMESTAMP - INTERVAL 1 DAY );
+(3, 1, CURRENT_TIMESTAMP - INTERVAL 1 DAY );
 INSERT INTO Watch_History (user, content, watch_date) VALUES
-    (1, 300, CURRENT_TIMESTAMP - INTERVAL 1 DAY );
+    (3, 300, CURRENT_TIMESTAMP - INTERVAL 1 DAY );
 INSERT INTO Watch_History (user, content, watch_date) VALUES
     (2, 303, CURRENT_TIMESTAMP - INTERVAL 1 DAY );
 INSERT INTO Watch_History (user, content, watch_date) VALUES

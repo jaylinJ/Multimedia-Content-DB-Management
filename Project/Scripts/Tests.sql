@@ -6,11 +6,8 @@ COLLABORATORS: Jaylin Jack
 
 USE MultimediaContentDB;
 
-SELECT * FROM Actor WHERE actorID = 1;
-
 -- ------------------- TRIGGER TESTING BELOW ---------------------------
 -- 1. Limit Watchlist Capacity ✅
-
 CALL PRC_ENFORCE_WATCHLIST_LIMIT(2);
 SELECT * FROM Watchlist WHERE Watchlist.user = 2 ORDER BY Watchlist.watchlistID ASC;
 
@@ -28,27 +25,38 @@ JOIN Content_Availability ON Content_Availability.content = Content.contentID
 WHERE Content_Availability.availability != 1;
 
 
+
 -- ------------ MAKE SURE InsertsAfterReadData.sql has been executed by now. -------------------
 
 -- TEST Actual Output, Content 1 shall now be archived ✅
 SELECT contentID AS 'Content ID', Content.title AS 'Title', Content_Availability.availability AS 'status'
 FROM Content
 JOIN Content_Availability ON Content_Availability.content = Content.contentID
-WHERE Content_Availability.availability != 1;
+WHERE Content_Availability.availability = 2;
 
 
 -- TESTS FOR 3. ✅
-CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(4, 2);
-SELECT * FROM Content WHERE contentID = 4;
-CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(4, 2);
-SELECT * FROM Content WHERE contentID = 4;
 
+-- INSERT ContentDirector for Content 5 and Director 4.
+CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(5, 4);
+SELECT * FROM Content WHERE contentID = 5;
+
+-- Now ContentDirector with the same value should return the error
+CALL PRC_INSERT_CONTENTDIRECTORS_OR_LOG_ERROR(5, 4);
+
+-- Make sure Content has only unique directors.
+SELECT Director.name AS 'Director'
+FROM ContentDirectors
+JOIN Director ON Director.directorID = ContentDirectors.director
+WHERE Director.directorID = 5;
+
+-- LOG Director Assignment Errors
 SELECT * FROM Director_Assignment_Errors;
 -- ------------------- FUNCTION TESTING BELOW ---------------------------
 
 
 --  4. Rank Top Genres by Watch Hours ✅
--- My top genres will change since they are generated randomly in ReadData. but works correctly still
+-- Should return Cartoon, Thriller and Comedy.
 SELECT FNC_TOP_GENRES_BY_WATCH_HISTORY();
 
 
@@ -73,6 +81,7 @@ SELECT FNC_VALIDATE_USER_SUBSCRIPTION(4);
 -- ------------------- PROCEDURE TESTING BELOW ---------------------------
 
 -- 7. Generate Monthly User Activity Report ✅
+-- User 1 should have thousands of content watched since we populate it's watch-history using ReadData.
 CALL PRC_GENERATE_USER_REPORT(1);
 CALL PRC_GENERATE_USER_REPORT(2);
 CALL PRC_GENERATE_USER_REPORT(3);
@@ -81,8 +90,9 @@ CALL PRC_GENERATE_USER_REPORT(5);
 
 
 -- 8. Process Batch Content Updates ✅
--- EXPECTED OUTPUT: 1,460 Content should be 'AT RISK' now.
+-- EXPECTED OUTPUT: 1,574 Content should be 'AT RISK' now.
 CALL PRC_UPDATE_CONTENT_AVAILABILITY();
+
 
 -- 9. Handled Failed Payments ✅
 -- EXPECTED OUTPUT: 2 Failed Payments for user 1 and 1 Failed Payment for user 2.
@@ -90,12 +100,11 @@ CALL PRC_FAILED_PAYMENT_FOR_USERS();
 
 -- 10. Remove Expired Subscriptions ✅
 -- Wait about 5 minutes from testing 6.
--- The Event is ran every 5 minutes so there's enough time to test 6. and 10.
+-- The Event is ran EVERYDAY so you may have to change event schedule to test. Or wait a day.
 SELECT * FROM User_Subscription;
 SELECT * FROM User_Notification;
 
 -- 11. Refresh Popular Content Rankings ✅
--- This result when change on different runs of ReadData since the genre is randomly generated.
 SELECT Content.title AS 'Content', Genre.description AS 'Genre'
 FROM Popular_Content_And_Genres
 JOIN Content ON Popular_Content_And_Genres.content = Content.contentID

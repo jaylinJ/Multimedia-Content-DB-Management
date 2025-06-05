@@ -34,7 +34,24 @@ CREATE TRIGGER IF NOT EXISTS TRG_RATING_ON_CONTENT_AVAILABILITY AFTER INSERT ON 
         END IF;
     END $$
 
+# This trigger automatically updates Content's Director if more Directors are added
+DROP TRIGGER IF EXISTS TRG_UPDATE_CONTENT_DIRECTOR$$
+CREATE TRIGGER IF NOT EXISTS TRG_UPDATE_CONTENT_DIRECTOR AFTER INSERT ON ContentDirectors FOR EACH ROW
+BEGIN
+    DECLARE current_director INT;
 
+    SELECT Content.director INTO current_director
+    FROM Content
+    WHERE Content.contentID = NEW.content;
+
+    IF current_director IS NULL OR current_director > 0 THEN
+        # IF the Content has a NULL director THEN change director to 'Multiple Directors'.
+        # DO the same if content has an initial director since there will be more directors.
+        UPDATE Content
+        SET director = 1
+        WHERE contentID = NEW.content;
+    END IF;
+END $$
 
 DELIMITER ;
 
